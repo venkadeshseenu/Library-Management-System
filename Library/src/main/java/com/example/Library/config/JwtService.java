@@ -78,13 +78,20 @@ public class JwtService {
         if (rolesObj instanceof List) {
             List<?> raw = (List<?>) rolesObj;
             List<String> out = new ArrayList<>();
-            raw.forEach(o -> out.add(String.valueOf(o)));
+            raw.forEach(o -> out.add(normalizeRole(String.valueOf(o))));
             return out;
         }
         Object roleObj = claims.get("role");
         if (roleObj != null) {
-            return List.of("ROLE_" + roleObj.toString());
+            return List.of(normalizeRole(roleObj.toString()));
         }
         return Collections.emptyList();
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return role;
+        }
+        return role.startsWith("ROLE_") ? role : "ROLE_" + role;
     }
 }

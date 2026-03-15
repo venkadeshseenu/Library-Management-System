@@ -7,6 +7,13 @@
 		"_exporter_id": "48679774",
 		"_collection_link": "https://ranjithamanivel2006-2568971.postman.co/workspace/Ranjitha-Manivel's-Workspace~b689b272-e94d-40e3-87ad-9d3b4c880062/collection/48679774-cb99d2a5-d662-4bf1-8ab1-d5ea0eba1562?action=share&source=collection_link&creator=48679774"
 	},
+	"variable": [
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	],
 	"item": [
 		{
 			"name": "Library Management API",
@@ -18,7 +25,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJpMUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjM4ODIyMDAsImV4cCI6MTc2Mzk2ODYwMH0.pyWYnL9RgzXyRCgdjb5psISNQ8xf8Zi2H--tqF4zgvg",
+								"value": "Bearer {{jwt_token}}",
 								"type": "text"
 							}
 						],
@@ -48,6 +55,25 @@
 				},
 				{
 					"name": "http://localhost:8081/api/auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseJson = pm.response.json();",
+									"if (responseJson.token) {",
+									"    pm.collectionVariables.set(\"jwt_token\", responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -131,7 +157,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYW5qaXRoYW1hbml2ZWwyMDA2QGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2Mzg3OTcxMCwiZXhwIjoxNzYzOTY2MTEwfQ.E-X_3p2P-ler_9XCLIoMvEh9TnReKD93MPJVvkCVT3c",
+								"value": "Bearer {{jwt_token}}",
 								"type": "text"
 							}
 						],
@@ -168,7 +194,11 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
-									"});"
+									"});",
+									"const responseJson = pm.response.json();",
+									"if (responseJson.token) {",
+									"    pm.collectionVariables.set(\"jwt_token\", responseJson.token);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -233,7 +263,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2Mzg3NzY1MywiZXhwIjoxNzYzOTY0MDUzfQ.gTQMRFViYmn9PNMccwnypi1eQGMQf-KsWGpWQzSYK5k",
+								"value": "Bearer {{jwt_token}}",
 								"type": "text"
 							}
 						],
@@ -270,7 +300,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2Mzg3NzY1MywiZXhwIjoxNzYzOTY0MDUzfQ.gTQMRFViYmn9PNMccwnypi1eQGMQf-KsWGpWQzSYK5k",
+								"value": "Bearer {{jwt_token}}",
 								"type": "text"
 							}
 						],
@@ -344,6 +374,25 @@
 				},
 				{
 					"name": "http://localhost:8081/api/auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const responseJson = pm.response.json();",
+									"if (responseJson.token) {",
+									"    pm.collectionVariables.set(\"jwt_token\", responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -430,7 +479,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYW5qaXRoYW1hbml2ZWwyMDA2QGdtYWlsLmNvbSIsImlhdCI6MTc2MDYwNjU5NCwiZXhwIjoxNzYwNjkyOTk0fQ.MUq6HHPWAt4a0EtD2Hu0cqTnGHUaE9praCN872cxNU0",
+								"value": "Bearer {{jwt_token}}",
 								"type": "text"
 							}
 						],

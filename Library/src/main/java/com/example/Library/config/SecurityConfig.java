@@ -1,5 +1,6 @@
 package com.example.Library.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,6 +68,9 @@ public class SecurityConfig {
 //                        .anyRequest().authenticated()
 //                        .anyRequest().permitAll()
                 )
+                .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, authException) ->
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

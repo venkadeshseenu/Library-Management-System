@@ -1,24 +1,31 @@
 package com.example.Library.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import java.util.List;
-
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -37,56 +44,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println("Authorization Header: " + request.getHeader("Authorization"));
+
         String token = header.substring(7);
         try {
             String username = jwtService.extractUsername(token);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
                 if (jwtService.isTokenValid(token, userDetails)) {
-                    // Extract roles from JWT
                     List<String> roles = jwtService.extractRoles(token);
+                    Collection<? extends GrantedAuthority> authorities = roles.isEmpty()
+                            ? userDetails.getAuthorities()
+                            : roles.stream()
+                                    .map(SimpleGrantedAuthority::new)
+                                    .toList();
 
-                  // Convert roles to authorities
-                    var authorities = roles.stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .toList();
-
-                 // Create authentication token
                     var authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             authorities
                     );
-
-                 // Set authentication
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                    // Debug logs (very useful)
-                    System.out.println("Authenticated User: " + username);
-                    System.out.println("Authorities: " + authorities);
-
-//                    var authToken = new UsernamePasswordAuthenticationToken(
-//                            userDetails,
-//                            null,
-//                            userDetails.getAuthorities()
-//                    );
-//                    System.out.println("Extracted Username: " + username);
-//                    System.out.println("Authorities: " + userDetails.getAuthorities());
-//                    System.out.println("Token Valid: " + jwtService.isTokenValid(token, userDetails));
-//                   // var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-//                    SecurityContextHolder.getContext().setAuthentication(authToken);
-//                    System.out.println("Authorities inside SecurityContext: " +
-//                            SecurityContextHolder.getContext()
-//                                    .getAuthentication()
-//                                    .getAuthorities());
+                    log.debug("Authenticated user '{}' with authorities {}", username, authorities);
                 }
             }
-        } catch (JwtException ex) {
-            // invalid token — clear context (optionally log)
+        } catch (ExpiredJwtException ex) {
             SecurityContextHolder.clearContext();
+            log.warn("JWT expired for request {} {}", request.getMethod(), request.getRequestURI());
+        } catch (JwtException ex) {
+            SecurityContextHolder.clearContext();
+            log.warn("Invalid JWT for request {} {}", request.getMethod(), request.getRequestURI());
         }
+
         filterChain.doFilter(request, response);
-        System.out.println("JWT FILTER CALLED");
     }
 }
